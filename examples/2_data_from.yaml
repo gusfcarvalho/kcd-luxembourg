@@ -1,0 +1,24 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: data-from
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: fake1
+    kind: ClusterSecretStore
+  dataFrom:
+  - extract:  # all keys from a JSON object
+      key: /bar/user
+    sourceRef:
+      storeRef:
+        name: fake2
+        kind: ClusterSecretStore
+  - find:
+      name:
+        regexp: "/foo/(.*)" # all secret  keys in provider
+    rewrite:
+    - regexp:
+        source: "_foo_(.*)"
+        target: "$1"
+      

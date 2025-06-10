@@ -1,0 +1,40 @@
+apiVersion: generators.external-secrets.io/v1alpha1
+kind: Password
+metadata:
+  name: my-password
+spec:
+  length: 42
+  digits: 5
+  symbols: 5
+  symbolCharacters: "-_$@"
+  noUpper: false
+  allowRepeat: true
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: generators-refresh-policy
+spec:
+#  refreshPolicy: CreatedOnce
+#  refreshPolicy: OnChange
+  refreshPolicy: Periodic
+  refreshInterval: 10s
+  dataFrom:
+  - sourceRef:
+      generatorRef:
+        apiVersion: generators.external-secrets.io/v1alpha1
+        kind: Password
+        name: "my-password"
+    rewrite:
+    - regexp:
+        source: "password"
+        target: "db-password"
+  - sourceRef:
+      generatorRef:
+        apiVersion: generators.external-secrets.io/v1alpha1
+        kind: Password
+        name: "my-password"
+    rewrite:
+    - regexp:
+        source: "password"
+        target: "db-username"

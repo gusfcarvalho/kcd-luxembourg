@@ -1,0 +1,28 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: multiple-stores
+  labels:
+    mycustomlabel.com/key: value
+  annotations:
+    mycustomannotation.com/key: value
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: fake1
+    kind: ClusterSecretStore
+  data:
+  - secretKey:  fake-1-key
+    sourceRef:
+      storeRef:
+        name:  fake1
+        kind: ClusterSecretStore
+    remoteRef:
+      key: "/foo/hello"
+  - secretKey:  fake-2-key
+    remoteRef:
+      key: "/bar/hello"
+    sourceRef:
+      storeRef:
+        name:  fake2
+        kind: ClusterSecretStore

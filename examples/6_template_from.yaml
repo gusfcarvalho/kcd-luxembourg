@@ -1,0 +1,56 @@
+# define your template in a config map
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-tpl
+data:
+  config.yaml: |
+    datasources:
+      - name: Graphite
+        type: graphite
+        access: proxy
+        password: "{{ .password }}"
+        user: "{{ .username }}"
+  keys-and-values: |
+     # key and value templated
+     my-application-{{ .username}}: {{ .password | b64enc }}
+     # conditional keys
+     {{- if hasPrefix "super-important-user" .username }}
+     enableSuperImportantFeatures: true
+     {{- else }}
+     enableSuperImportantFeatures: false
+     {{- end }}
+     # Fixed values
+     application-type: my-app
+  annotations: |
+     #dynamic timestamp generation
+     last-synced-for-user/{{ .username }}: {{ now }}
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: template-from
+spec:
+  secretStoreRef:
+    name: fake1
+    kind: ClusterSecretStore
+  target:
+    template:
+      templateFrom:
+      - target: Data
+        configMap:
+          name: config-tpl
+          items:
+          - key: config.yaml
+            templateAs: Values
+          - key: keys-and-values
+            templateAs: KeysAndValues
+      - target: Annotations
+        configMap:
+          name: config-tpl
+          items:
+          - key: annotations
+            templateAs: KeysAndValues
+  dataFrom:
+  - extract:
+      key: /foo/user

@@ -1,0 +1,13 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: decoding-strategy
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: fake2
+    kind: ClusterSecretStore
+  dataFrom:
+  - extract:  # all keys from a JSON object
+      key: /bar/user
+      decodingStrategy: Base64

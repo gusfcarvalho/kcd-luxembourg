@@ -1,0 +1,23 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: template
+spec:
+  secretStoreRef:
+    name: fake1
+    kind: ClusterSecretStore
+  target:
+    template:
+      metadata:
+        annotations: 
+          myannotation.com/myKey: "{{ .myKey }} can go here as well!"
+        labels: 
+           mylabel.com/myKey: "{{ .myKey }}-as-a-label"
+      data:
+        name: admin
+        password: "{{ .myKey }}"               # If you are using plain manifests or gitops tools
+        # password: "{{ `{{ .myKey }}` }}"         # If you are using helm
+  data:
+  - secretKey: myKey
+    remoteRef:
+      key: /foo/hello

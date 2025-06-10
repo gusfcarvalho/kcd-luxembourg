@@ -1,0 +1,17 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: delete-policy
+spec:
+  refreshInterval: 10s
+  secretStoreRef:
+    name: fake1
+    kind: ClusterSecretStore
+  target:
+    name: new-secret
+    creationPolicy: Owner
+    deletionPolicy: Delete
+  data:
+  - secretKey:  fake-1-key
+    remoteRef:
+      key: "/foo/hello"
